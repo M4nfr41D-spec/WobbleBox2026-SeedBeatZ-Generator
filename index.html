@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WobbleBox v4 — Seed Stack + Auto-Lanes + Auto-Fills (Acid/Dark)</title>
+  
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+<div class="wrap">
+  <h1>WobbleBox v4 — Acid / Acid Trance / Dark Trance / Dark Techno • Seed Stack • Auto-Lanes • Auto-Fills • Beat-Sync • WAV/MIDI/Project</h1>
+
+  <div class="row">
+    <div class="panel">
+      <h2>Transport • Style • Seed</h2>
+      <div class="kv">
+        <button id="btnPlay" class="btnOk">▶ Play</button>
+        <button id="btnStop" class="btnDanger">■ Stop</button>
+        <span class="badge" id="status">stopped</span>
+        <span class="badge" id="pos">bar 1/1 • step 1</span>
+      </div>
+
+      <div class="hr"></div>
+
+      <label>Style
+        <select id="style">
+          <option value="acid">Acid</option>
+          <option value="acid_trance" selected>Acid Trance</option>
+          <option value="dark_trance">Dark Trance</option>
+          <option value="dark_techno">Dark Techno</option>
+        </select>
+      </label>
+
+      <label>Preset
+        <select id="preset">
+          <option value="acid_trance_rave" selected>Acid Trance Rave (bright)</option>
+          <option value="dark_techno_roll">Dark Techno Roll (tight)</option>
+        </select>
+      </label>
+
+      <label>Base Seed (Layer A)
+        <input id="seed" type="text" value="1337-ACID" />
+      </label>
+
+      <div class="kv">
+        <button id="btnRandSeed" class="btnWarn">🎲 Random Seed</button>
+        <button id="btnRegen" class="btnAccent">↻ Regenerate</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <label>BPM <span><span id="bpmVal">145</span></span>
+        <input id="bpm" type="range" min="60" max="190" value="145" />
+      </label>
+      <label>Swing <span><span id="swingVal">0.12</span></span>
+        <input id="swing" type="range" min="0" max="0.6" step="0.01" value="0.12" />
+      </label>
+      <label>Humanize <span><span id="humanVal">0.08</span></span>
+        <input id="humanize" type="range" min="0" max="0.35" step="0.01" value="0.08" />
+      </label>
+
+      <label>Steps/Bar
+        <select id="stepsPerBar">
+          <option value="16" selected>16</option>
+          <option value="32">32</option>
+        </select>
+      </label>
+
+      <label>Edit Mode
+        <select id="editMode">
+          <option value="off" selected>off (read-only)</option>
+          <option value="on">on (click to toggle)</option>
+        </select>
+      </label>
+
+      <div class="tiny">
+        Editor: <span class="hint">Click</span>=toggle • <span class="hint">Shift+Click</span>=accent • <span class="hint">Alt+Click</span>=slide (Bass) • <span class="hint">Ctrl/⌘+Click</span>=note+1 (Bass)
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Arrangement • Seed Stack • Mutators • Mutes</h2>
+
+      <label>Loop Bars
+        <select id="loopBars">
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="4">4</option>
+          <option value="8">8</option>
+        </select>
+      </label>
+
+      <label>Variation <span id="varVal">0.22</span>
+        <input id="variation" type="range" min="0" max="1" step="0.01" value="0.22" />
+      </label>
+
+      <label>Seed Mode
+        <select id="seedMode">
+          <option value="sequence" selected>sequence (hintereinander)</option>
+          <option value="overlay">overlay (übereinander)</option>
+        </select>
+      </label>
+
+      <div class="kv">
+        <button id="btnAddLayer" class="btnAccent">+ Layer</button>
+        <button id="btnNudgeLayer" class="btnWarn">Nudge Active (+1)</button>
+      </div>
+
+      <div id="seedLayers"></div>
+
+      <div class="hr"></div>
+
+      <label>Mutator
+        <select id="mutator">
+          <option value="none" selected>none</option>
+          <option value="buildup">buildup (cutoff up)</option>
+          <option value="breakdown">breakdown (space)</option>
+          <option value="acidLift">acid lift (res + drive)</option>
+        </select>
+      </label>
+
+      <label>Mutator Intensity <span id="mutVal">0.38</span>
+        <input id="mutIntensity" type="range" min="0" max="1" step="0.01" value="0.38" />
+      </label>
+
+      <div class="hr"></div>
+      <div class="tiny">Bar-Editor: wähle Bar (1..LoopBars) zum Editieren. Playback läuft über alle Bars.</div>
+      <div class="pillRow" id="barTabs"></div>
+
+      <div class="hr"></div>
+      <div class="tiny">Track Mute (live + export):</div>
+      <div class="kv">
+        <button id="muteKick" class="btnAccent">Kick</button>
+        <button id="muteSnare" class="btnAccent">Snare</button>
+        <button id="muteHat" class="btnAccent">Hat</button>
+        <button id="muteBass" class="btnAccent">Bass</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Auto-Lanes • Auto-Fills • Beat-Sync</h2>
+
+      <label>Auto Lanes
+        <select id="autoLanes">
+          <option value="off" selected>off</option>
+          <option value="on">on</option>
+        </select>
+      </label>
+      <label>Lane Strength <span id="laneStrVal">0.55</span>
+        <input id="laneStrength" type="range" min="0" max="1" step="0.01" value="0.55" />
+      </label>
+
+      <div class="hr"></div>
+
+      <label>Auto Fills
+        <select id="autoFills">
+          <option value="off" selected>off</option>
+          <option value="on">on</option>
+        </select>
+      </label>
+      <label>Fill Period
+        <select id="fillPeriod">
+          <option value="2">every 2 bars</option>
+          <option value="4" selected>every 4 bars</option>
+          <option value="8">every 8 bars</option>
+        </select>
+      </label>
+      <label>Fill Intensity <span id="fillIntVal">0.45</span>
+        <input id="fillIntensity" type="range" min="0" max="1" step="0.01" value="0.45" />
+      </label>
+
+      <div class="hr"></div>
+
+      <label>Delay Sync
+        <select id="delaySync">
+          <option value="free">free</option>
+          <option value="1/8">1/8</option>
+          <option value="1/16" selected>1/16</option>
+          <option value="1/32">1/32</option>
+        </select>
+      </label>
+
+      <label>Sidechain Pump <span id="pumpVal">0.35</span>
+        <input id="sidechainPump" type="range" min="0" max="1" step="0.01" value="0.35" />
+      </label>
+
+      <div class="tiny warn">Auto-Fills ändern das Playback/Export, nicht den Editor (non-destructive).</div>
+    </div>
+
+    <div class="panel">
+      <h2>Bass • Keyboard</h2>
+
+      <label>Filter Model
+        <select id="filterModel">
+          <option value="biquad" selected>Biquad LP (stable)</option>
+          <option value="cascade24">Cascade 24dB (more “acid/MC”) </option>
+        </select>
+      </label>
+
+      <label>Pitch (transpose) <span id="pitchVal">0</span>
+        <input id="pitch" type="range" min="-24" max="24" step="1" value="0" />
+      </label>
+
+      <label>Root Note
+        <select id="rootNote">
+          <option value="36">C2</option><option value="37">C#2</option><option value="38">D2</option><option value="39">D#2</option><option value="40">E2</option><option value="41">F2</option>
+          <option value="42">F#2</option><option value="43" selected>G2</option><option value="44">G#2</option><option value="45">A2</option><option value="46">A#2</option><option value="47">B2</option>
+        </select>
+      </label>
+
+      <div class="hr"></div>
+
+      <div class="tiny">Keyboard: Klick = Preview + setzt “Selected Note” fürs Bass-Editing.</div>
+      <div class="keyboard" id="kbd"></div>
+
+      <div class="hr"></div>
+      <label>Selected Note <span class="badge" id="selNoteBadge">G2</span></label>
+
+      <label>Wobble Amount <span id="wobbleAmtVal">0.64</span>
+        <input id="wobbleAmt" type="range" min="0" max="1" step="0.01" value="0.64" />
+      </label>
+
+      <label>Wobble Sync
+        <select id="wobbleSync">
+          <option value="free">free (Hz)</option>
+          <option value="1/2">1/2</option>
+          <option value="1/4">1/4</option>
+          <option value="1/8">1/8</option>
+          <option value="1/16" selected>1/16</option>
+          <option value="1/32">1/32</option>
+        </select>
+      </label>
+
+      <label>Wobble Hz <span id="wobbleHzVal">6.00</span>
+        <input id="wobbleHz" type="range" min="0.2" max="14" step="0.01" value="6.00" />
+      </label>
+
+      <label>LFO Wave
+        <select id="lfoWave">
+          <option value="sine" selected>sine</option>
+          <option value="triangle">triangle</option>
+          <option value="square">square</option>
+          <option value="sawtooth">saw</option>
+        </select>
+      </label>
+
+      <label>LFO Filter <span id="lfoFilterVal">20.0</span>
+        <input id="lfoFilter" type="range" min="0.5" max="50" step="0.1" value="20.0" />
+      </label>
+
+      <label>LFO Target
+        <select id="lfoTarget">
+          <option value="filter" selected>filter</option>
+          <option value="amp">amp</option>
+          <option value="both">both</option>
+        </select>
+      </label>
+
+      <label>Cutoff <span id="cutoffVal">650</span>
+        <input id="cutoff" type="range" min="60" max="4000" step="1" value="650" />
+      </label>
+      <label>Resonance <span id="resVal">0.62</span>
+        <input id="res" type="range" min="0.1" max="0.95" step="0.01" value="0.62" />
+      </label>
+      <label>Drive <span id="driveVal">0.26</span>
+        <input id="drive" type="range" min="0" max="1" step="0.01" value="0.26" />
+      </label>
+
+      <label>Chorus Mix <span id="chorusVal">0.35</span>
+        <input id="chorus" type="range" min="0" max="0.8" step="0.01" value="0.35" />
+      </label>
+
+      <label>Delay Mix <span id="delayVal">0.24</span>
+        <input id="delay" type="range" min="0" max="0.55" step="0.01" value="0.24" />
+      </label>
+
+      <label>Reverb Mix <span id="revVal">0.18</span>
+        <input id="reverb" type="range" min="0" max="0.55" step="0.01" value="0.18" />
+      </label>
+
+      <label>Glide (ms) <span id="glideVal">55</span>
+        <input id="glide" type="range" min="0" max="180" step="1" value="55" />
+      </label>
+
+      <label>Sub Mix <span id="subVal">0.26</span>
+        <input id="subMix" type="range" min="0" max="0.8" step="0.01" value="0.26" />
+      </label>
+    </div>
+
+    <div class="panel">
+      <h2>Mix / EQ / Export / Project</h2>
+
+      <label>Kick Vol <span id="kickVolVal">0.88</span>
+        <input id="kickVol" type="range" min="0" max="1.2" step="0.01" value="0.88" />
+      </label>
+      <label>Snare Vol <span id="snareVolVal">0.72</span>
+        <input id="snareVol" type="range" min="0" max="1.2" step="0.01" value="0.72" />
+      </label>
+      <label>Hat Vol <span id="hatVolVal">0.60</span>
+        <input id="hatVol" type="range" min="0" max="1.2" step="0.01" value="0.60" />
+      </label>
+      <label>Bass Vol <span id="bassVolVal">0.78</span>
+        <input id="bassVol" type="range" min="0" max="1.2" step="0.01" value="0.78" />
+      </label>
+
+      <div class="hr"></div>
+
+      <label>Low (dB) <span id="lowVal">1</span>
+        <input id="low" type="range" min="-12" max="12" step="1" value="1" />
+      </label>
+      <label>Mid (dB) <span id="midVal">0</span>
+        <input id="mid" type="range" min="-12" max="12" step="1" value="0" />
+      </label>
+      <label>High (dB) <span id="highVal">3</span>
+        <input id="high" type="range" min="-12" max="12" step="1" value="3" />
+      </label>
+
+      <div class="hr"></div>
+
+      <label>Export Bars
+        <select id="exportBars">
+          <option>4</option><option selected>8</option><option>16</option><option>32</option>
+        </select>
+      </label>
+
+      <div class="kv">
+        <button id="btnExportMix" class="btnAccent">⬇ Export WAV (Mix)</button>
+        <button id="btnExportStems">⬇ Export WAV (Stems)</button>
+        <button id="btnExportMIDI" class="btnAccent">⬇ Export MIDI</button>
+        <button id="btnExportProject" class="btnPink">⬇ Export Project (.json)</button>
+        <button id="btnImportProject">⬆ Import Project</button>
+        <input id="fileImport" type="file" accept="application/json" style="display:none" />
+      </div>
+
+      <div class="tiny">
+        WAV: 16-bit PCM Stereo. MIDI: Type-0, Drums Ch10 (GM), Bass Ch1. Project JSON enthält Seed Stack + Patterns + Mutes + Autolanes/Fills.
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:12px;">
+    <h2>Pattern-Editor (selected Bar)</h2>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="panel" style="margin-top:12px;">
+    <h2>Debug-Log</h2>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
